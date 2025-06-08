@@ -24,7 +24,7 @@ public class PipeMonster : MonoBehaviour
     System.Collections.IEnumerator HeadMoveRoutine()
     {
         // 올라가기
-        float duration = 0.75f;
+        float duration = 0.5f;
         float elapsed = 0f;
         Vector3 start = new Vector3(0, 0.5f, 0);
         Vector3 end = new Vector3(0, 1f, 0);

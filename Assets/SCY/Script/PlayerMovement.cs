@@ -1,5 +1,5 @@
-using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour, ICreature
 {
@@ -11,25 +11,34 @@ public class PlayerMovement : MonoBehaviour, ICreature
     private Rigidbody2D rb;
     private bool isGrounded;
     private bool isTouchingWall;
+    private Animator animator;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
         Move();
         Jump();
+
+        animator.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+
+        if (transform.position.y <= -6f)
+        {
+            Die();
+        }
     }
 
     private void FixedUpdate()
     {
         CheckGroundRaycast();
 
-        if (!isGrounded && isTouchingWall && Mathf.Abs(rb.linearVelocity.y) < 0.01f)
+        if (!isGrounded && isTouchingWall && rb.linearVelocity.y > -3f)
         {
-            rb.linearVelocity = new Vector2(0f, -1f);
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, -6f);
         }
     }
 
@@ -37,6 +46,14 @@ public class PlayerMovement : MonoBehaviour, ICreature
     {
         float moveInput = Input.GetAxisRaw("Horizontal");
         rb.linearVelocity = new Vector2(moveInput * MoveSpeed, rb.linearVelocity.y);
+
+        // ÁÂ¿ì ¹ÝÀü
+        if (moveInput != 0)
+        {
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Sign(moveInput);
+            transform.localScale = scale;
+        }
     }
 
     private void Jump()
@@ -51,6 +68,8 @@ public class PlayerMovement : MonoBehaviour, ICreature
     {
         RaycastHit2D hit = Physics2D.Raycast(GroundCheck.position, Vector2.down, GroundRayLength);
         isGrounded = hit.collider != null;
+
+        Debug.DrawRay(GroundCheck.position, Vector2.down * GroundRayLength, isGrounded ? Color.green : Color.red);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -95,8 +114,25 @@ public class PlayerMovement : MonoBehaviour, ICreature
         isTouchingWall = false;
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Coin"))
+        {
+            GameManager.Instance.AddCoin();               
+            Destroy(collision.gameObject);              
+        }
+
+        if (collision.CompareTag("FinishLine"))
+        {   
+
+            SceneManager.LoadScene("SampleScene 1");
+        }
+    }
+
     public void Die()
     {
+        GameManager.Instance.AddDeath();
+        GameManager.Instance.coinCount = 0;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
