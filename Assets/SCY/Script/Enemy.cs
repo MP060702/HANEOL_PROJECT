@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, ICreature
 {
     public float moveSpeed = 2f;
     private Rigidbody2D rb;

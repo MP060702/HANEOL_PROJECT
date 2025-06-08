@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour, ICreature
 {
     public float MoveSpeed = 5f;
     public float JumpForce = 10f;
@@ -70,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
                 }
                 else
                 {
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                    Die();
                 }
                 break;
             }
@@ -93,5 +93,10 @@ public class PlayerMovement : MonoBehaviour
     private void OnCollisionExit2D(Collision2D collision)
     {
         isTouchingWall = false;
+    }
+
+    public void Die()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
